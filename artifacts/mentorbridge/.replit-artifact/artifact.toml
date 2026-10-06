@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/mentorbridge/"
+title = "MentorBridge"
+description = "MentorBridge connects students with verified industry professionals through mentor discovery, career guidance, session booking, messaging, and progress tracking. This first release provides a polished, functional demo with a connected API and clearly labeled integration placeholders."
+version = "1.0.0"
+id = "artifacts/mentorbridge"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/mentorbridge/" ]
+localPort = 20292
+
+[services.development]
+run = "pnpm --filter @workspace/mentorbridge run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/mentorbridge", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/mentorbridge/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "20292"
+BASE_PATH = "/mentorbridge/"

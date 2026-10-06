@@ -5,7 +5,8 @@
  * MentorBridge demo marketplace API
  * OpenAPI spec version: 0.1.0
  */
+import type { GetDashboardRole } from './getDashboardRole';
 
-export interface HealthStatus {
-  status: string;
-}
+export type GetDashboardParams = {
+role?: GetDashboardRole;
+};

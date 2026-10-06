@@ -5,7 +5,8 @@
  * MentorBridge demo marketplace API
  * OpenAPI spec version: 0.1.0
  */
+import type { GetBookingsRole } from './getBookingsRole';
 
-export interface HealthStatus {
-  status: string;
-}
+export type GetBookingsParams = {
+role?: GetBookingsRole;
+};

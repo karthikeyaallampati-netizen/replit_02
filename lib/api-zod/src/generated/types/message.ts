@@ -6,6 +6,11 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface HealthStatus {
-  status: string;
+export interface Message {
+  id: string;
+  conversationId: string;
+  sender: string;
+  body: string;
+  time: string;
+  mine: boolean;
 }

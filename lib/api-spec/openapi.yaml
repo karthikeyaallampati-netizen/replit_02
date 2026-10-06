@@ -3,20 +3,25 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: MentorBridge demo marketplace API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
-    description: Health operations
+  - name: mentors
+  - name: bookings
+  - name: dashboard
+  - name: reviews
+  - name: messages
+  - name: notifications
+  - name: progress
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +29,332 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /mentors:
+    get:
+      operationId: getMentors
+      tags: [mentors]
+      summary: Search and filter demo mentors
+      parameters:
+        - in: query
+          name: search
+          schema: { type: string }
+        - in: query
+          name: category
+          schema: { type: string }
+        - in: query
+          name: minRating
+          schema: { type: number }
+        - in: query
+          name: maxPrice
+          schema: { type: number }
+      responses:
+        "200":
+          description: Mentor list
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Mentor" }
+  /mentors/{id}:
+    get:
+      operationId: getMentor
+      tags: [mentors]
+      summary: Get a mentor profile
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Mentor profile
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Mentor" }
+        "404":
+          description: Mentor not found
+  /bookings:
+    get:
+      operationId: getBookings
+      tags: [bookings]
+      summary: List demo bookings
+      parameters:
+        - in: query
+          name: role
+          schema: { type: string, enum: [student, mentor] }
+      responses:
+        "200":
+          description: Booking list
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Booking" }
+    post:
+      operationId: createBooking
+      tags: [bookings]
+      summary: Create a demo booking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/BookingInput" }
+      responses:
+        "201":
+          description: Booking created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Booking" }
+  /dashboard:
+    get:
+      operationId: getDashboard
+      tags: [dashboard]
+      summary: Get role-specific demo dashboard data
+      parameters:
+        - in: query
+          name: role
+          schema: { type: string, enum: [student, mentor, admin] }
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Dashboard" }
+  /reviews:
+    get:
+      operationId: getReviews
+      tags: [reviews]
+      summary: Get demo mentor reviews
+      parameters:
+        - in: query
+          name: mentorId
+          schema: { type: string }
+      responses:
+        "200":
+          description: Review list
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Review" }
+    post:
+      operationId: createReview
+      tags: [reviews]
+      summary: Submit a demo review
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ReviewInput" }
+      responses:
+        "201":
+          description: Review created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Review" }
+  /messages:
+    get:
+      operationId: getMessages
+      tags: [messages]
+      summary: List demo messages
+      parameters:
+        - in: query
+          name: conversationId
+          schema: { type: string }
+      responses:
+        "200":
+          description: Message list
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Message" }
+    post:
+      operationId: sendMessage
+      tags: [messages]
+      summary: Send a demo message
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/MessageInput" }
+      responses:
+        "201":
+          description: Message sent
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Message" }
+  /notifications:
+    get:
+      operationId: getNotifications
+      tags: [notifications]
+      summary: Get demo notifications
+      responses:
+        "200":
+          description: Notifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Notification" }
+  /notifications/{id}/read:
+    patch:
+      operationId: markNotificationRead
+      tags: [notifications]
+      summary: Mark a notification as read
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Updated notification
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Notification" }
+  /progress:
+    get:
+      operationId: getProgress
+      tags: [progress]
+      summary: Get demo career progress
+      responses:
+        "200":
+          description: Progress and goals
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Progress" }
 components:
   schemas:
     HealthStatus:
       type: object
       properties:
-        status:
-          type: string
-      required:
-        - status
-
+        status: { type: string }
+      required: [status]
+    Mentor:
+      type: object
+      required: [id, name, title, company, category, location, experienceYears, rating, reviewCount, sessions, price, availability, verified, bio, skills, avatar]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        title: { type: string }
+        company: { type: string }
+        category: { type: string }
+        location: { type: string }
+        experienceYears: { type: integer }
+        rating: { type: number }
+        reviewCount: { type: integer }
+        sessions: { type: integer }
+        price: { type: number }
+        availability: { type: string }
+        verified: { type: boolean }
+        bio: { type: string }
+        skills:
+          type: array
+          items: { type: string }
+        avatar: { type: string }
+        companyColor: { type: string }
+        match: { type: integer }
+    Booking:
+      type: object
+      required: [id, mentorId, mentorName, studentName, type, date, time, status, price]
+      properties:
+        id: { type: string }
+        mentorId: { type: string }
+        mentorName: { type: string }
+        studentName: { type: string }
+        type: { type: string }
+        date: { type: string }
+        time: { type: string }
+        status: { type: string, enum: [confirmed, pending, completed] }
+        price: { type: number }
+        meetingUrl: { type: ["string", "null"] }
+    BookingInput:
+      type: object
+      required: [mentorId, type, date, time]
+      properties:
+        mentorId: { type: string }
+        type: { type: string }
+        date: { type: string }
+        time: { type: string }
+    Dashboard:
+      type: object
+      required: [role, sessions, upcoming, earnings, rating, students, progress, activity]
+      properties:
+        role: { type: string }
+        sessions: { type: integer }
+        upcoming: { type: integer }
+        earnings: { type: number }
+        rating: { type: number }
+        students: { type: integer }
+        progress: { type: integer }
+        activity:
+          type: array
+          items: { type: string }
+    Review:
+      type: object
+      required: [id, mentorId, studentName, rating, comment, date, tags]
+      properties:
+        id: { type: string }
+        mentorId: { type: string }
+        studentName: { type: string }
+        rating: { type: integer }
+        comment: { type: string }
+        date: { type: string }
+        tags:
+          type: array
+          items: { type: string }
+    ReviewInput:
+      type: object
+      required: [mentorId, rating, comment]
+      properties:
+        mentorId: { type: string }
+        rating: { type: integer, minimum: 1, maximum: 5 }
+        comment: { type: string, minLength: 3, maxLength: 1000 }
+        tags:
+          type: array
+          items: { type: string }
+    Message:
+      type: object
+      required: [id, conversationId, sender, body, time, mine]
+      properties:
+        id: { type: string }
+        conversationId: { type: string }
+        sender: { type: string }
+        body: { type: string }
+        time: { type: string }
+        mine: { type: boolean }
+    MessageInput:
+      type: object
+      required: [conversationId, body]
+      properties:
+        conversationId: { type: string }
+        body: { type: string, minLength: 1, maxLength: 2000 }
+    Notification:
+      type: object
+      required: [id, title, detail, time, unread]
+      properties:
+        id: { type: string }
+        title: { type: string }
+        detail: { type: string }
+        time: { type: string }
+        unread: { type: boolean }
+    ProgressSkill:
+      type: object
+      required: [name, value, color]
+      properties:
+        name: { type: string }
+        value: { type: integer }
+        color: { type: string }
+    Progress:
+      type: object
+      required: [goal, completion, skills, nextSteps]
+      properties:
+        goal: { type: string }
+        completion: { type: integer }
+        skills:
+          type: array
+          items: { $ref: "#/components/schemas/ProgressSkill" }
+        nextSteps:
+          type: array
+          items: { type: string }
