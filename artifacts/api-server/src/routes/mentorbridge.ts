@@ -30,6 +30,7 @@ import {
   type Progress,
   type Review,
 } from "@workspace/api-zod";
+import { generateMentorMatches, generateSessionPrep, generateGoalRoadmap } from "../lib/gemini";
 
 const router: IRouter = Router();
 
@@ -300,6 +301,144 @@ router.patch("/notifications/:id/read", (req, res): void => {
 
 router.get("/progress", (_req, res): void => {
   res.json(GetProgressResponse.parse(progress));
+});
+
+
+// User store for authentication (Full-stack CRUD and session support)
+interface AuthUser {
+  id: string;
+  name: string;
+  email: string;
+  role: "student" | "mentor" | "admin";
+  avatar: string;
+  password?: string;
+}
+
+const users: AuthUser[] = [
+  { id: "u-student", name: "Alex Morgan", email: "student@mentorbridge.com", role: "student", avatar: "AM", password: "password123" },
+  { id: "m-01", name: "Maya Chen", email: "mentor@mentorbridge.com", role: "mentor", avatar: "MC", password: "password123" },
+  { id: "u-admin", name: "Sarah Jenkins", email: "admin@mentorbridge.com", role: "admin", avatar: "SJ", password: "password123" },
+];
+
+router.post("/auth/login", (req, res): void => {
+  const { email, password, role } = req.body || {};
+  if (!email || typeof email !== "string") {
+    res.status(400).json({ error: "Email address is required." });
+    return;
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+  let user = users.find((u) => u.email.toLowerCase() === normalizedEmail);
+
+  if (!user) {
+    const derivedRole: "student" | "mentor" | "admin" =
+      role === "mentor" || role === "admin" ? role : "student";
+    const namePart = normalizedEmail.split("@")[0].replace(/[^a-zA-Z]/g, " ");
+    const formattedName = namePart ? namePart.charAt(0).toUpperCase() + namePart.slice(1) : "Demo User";
+    user = {
+      id: `u-${Date.now().toString(36)}`,
+      name: formattedName,
+      email: normalizedEmail,
+      role: derivedRole,
+      avatar: formattedName.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() || "DU",
+    };
+    users.push(user);
+  }
+
+  const token = `mb_sess_${Buffer.from(`${user.id}:${Date.now()}`).toString("base64")}`;
+  res.json({
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      avatar: user.avatar,
+    },
+    token,
+  });
+});
+
+router.post("/auth/register", (req, res): void => {
+  const { name, email, role, password } = req.body || {};
+  if (!email || !name) {
+    res.status(400).json({ error: "Name and email are required." });
+    return;
+  }
+  const normalizedEmail = email.trim().toLowerCase();
+  const existing = users.find((u) => u.email.toLowerCase() === normalizedEmail);
+  if (existing) {
+    res.status(409).json({ error: "An account with this email already exists." });
+    return;
+  }
+  const newUser: AuthUser = {
+    id: `u-${Date.now().toString(36)}`,
+    name: name.trim(),
+    email: normalizedEmail,
+    role: role === "mentor" || role === "admin" ? role : "student",
+    avatar: name.trim().split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase() || "U",
+    password: password || "password123",
+  };
+  users.push(newUser);
+  const token = `mb_sess_${Buffer.from(`${newUser.id}:${Date.now()}`).toString("base64")}`;
+  res.status(201).json({
+    user: {
+      id: newUser.id,
+      name: newUser.name,
+      email: newUser.email,
+      role: newUser.role,
+      avatar: newUser.avatar,
+    },
+    token,
+  });
+});
+
+router.get("/auth/me", (req, res): void => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    res.status(401).json({ user: null });
+    return;
+  }
+  res.json({ user: users[0] });
+});
+
+router.post("/auth/logout", (_req, res): void => {
+  res.json({ success: true, message: "Logged out successfully." });
+});
+
+// Backend-only Gemini AI endpoints with JSON mode and secret protection
+router.post("/ai/match", async (req, res): Promise<void> => {
+  try {
+    const { goal, field } = req.body || {};
+    if (!goal) {
+      res.status(400).json({ error: "Goal is required for AI matching." });
+      return;
+    }
+    const result = await generateMentorMatches(goal, field, mentors);
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message || "Failed to generate matches" });
+  }
+});
+
+router.post("/ai/session-prep", async (req, res): Promise<void> => {
+  try {
+    const { mentorId, sessionType } = req.body || {};
+    const mentor = mentors.find((m) => m.id === mentorId) || mentors[0];
+    const result = await generateSessionPrep(mentor, sessionType || "1:1 Career Mentorship");
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message || "Failed to generate session prep" });
+  }
+});
+
+router.post("/ai/roadmap", async (req, res): Promise<void> => {
+  try {
+    const { goal } = req.body || {};
+    const result = await generateGoalRoadmap(goal || "Land my first Senior Software Engineer role");
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message || "Failed to generate roadmap" });
+  }
 });
 
 export default router;
