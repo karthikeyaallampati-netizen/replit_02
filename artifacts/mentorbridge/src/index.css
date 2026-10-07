@@ -175,23 +175,54 @@ main {
 }
 
 .brand-mark {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
-  color: #f0fdf9;
   display: grid;
   place-items: center;
-  font-family: var(--app-font-serif);
-  font-size: 20px;
-  font-weight: 800;
-  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.35);
   transition: transform 0.25s ease, box-shadow 0.25s ease;
+  flex-shrink: 0;
+}
+
+.brand-mark:has(svg) {
+  background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+  color: #f0fdf9;
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.35);
+}
+
+.brand-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
 }
 
 .brand:hover .brand-mark {
-  transform: rotate(-6deg) scale(1.05);
-  box-shadow: 0 6px 18px rgba(13, 148, 136, 0.45);
+  transform: rotate(-4deg) scale(1.06);
+  filter: drop-shadow(0 6px 14px rgba(99, 102, 241, 0.35));
+}
+
+.brand-name {
+  font-family: var(--app-font-serif);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  font-size: 21px;
+  color: #0f172a;
+  display: inline-flex;
+  align-items: baseline;
+}
+
+.brand-name-accent {
+  color: #6366f1;
+}
+
+.brand-tagline {
+  font-size: 9.5px;
+  letter-spacing: 0.05em;
+  color: #64748b;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-top: -3px;
 }
 
 /* Nav Links & Dropdown Containers */

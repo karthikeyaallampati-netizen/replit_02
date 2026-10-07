@@ -272,11 +272,15 @@ function LoginModal() {
       <div className="auth-modal-box" onClick={(e) => e.stopPropagation()} data-testid="auth-modal">
         {/* Modal Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px 16px', borderBottom: '1px solid rgba(13, 148, 136, 0.12)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div className="brand-mark" style={{ width: 32, height: 32, fontSize: 16 }}>m</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div className="brand-mark" style={{ width: 38, height: 38 }}>
+              <img src="/logo-icon.png" alt="MentorBridge Logo" />
+            </div>
             <div>
-              <h2 className="serif" style={{ fontSize: 19, margin: 0 }}>MentorBridge Access</h2>
-              <span className="muted" style={{ fontSize: 11 }}>Full working authentication process</span>
+              <h2 className="serif" style={{ fontSize: 19, margin: 0, fontWeight: 700, color: '#0f172a' }}>
+                Mentor<span style={{ color: '#6366f1' }}>Bridge</span> Access
+              </h2>
+              <span className="muted" style={{ fontSize: 11 }}>Guidance Today • Greater Tomorrows</span>
             </div>
           </div>
           <button
@@ -597,8 +601,15 @@ function Shell({ children }: { children: ReactNode }) {
           {/* Main Navigation Row */}
           <div className="nav-main-row">
             <Link href="/" className="brand" onClick={closeAll} data-testid="link-brand">
-              <span className="brand-mark">m</span>
-              <span>mentorbridge</span>
+              <span className="brand-mark">
+                <img src="/logo-icon.png" alt="MentorBridge Logo" />
+              </span>
+              <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.15 }}>
+                <span className="brand-name">
+                  Mentor<span className="brand-name-accent">Bridge</span>
+                </span>
+                <span className="brand-tagline">Guidance Today • Greater Tomorrows</span>
+              </div>
             </Link>
 
             <button
@@ -938,9 +949,13 @@ function Shell({ children }: { children: ReactNode }) {
       <main>{children}</main>
 
       <footer className="footer">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div className="brand-mark" style={{ width: 26, height: 26, fontSize: 14 }}>m</div>
-          <strong>MentorBridge</strong> · Honest career conversations with real perspective.
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div className="brand-mark" style={{ width: 32, height: 32 }}>
+            <img src="/logo-icon.png" alt="MentorBridge Logo" />
+          </div>
+          <div>
+            <strong style={{ fontSize: 15, color: '#0f172a' }}>Mentor<span style={{ color: '#6366f1' }}>Bridge</span></strong> · Guidance Today • Greater Tomorrows
+          </div>
         </div>
         <span>Sample data only. No connected payments, external calls, or live user tracking.</span>
       </footer>
@@ -1077,9 +1092,26 @@ function Home() {
           </div>
         </div>
 
-        {/* Floating Spotlight Card */}
-        <div className="orb" aria-hidden="true">
-          <span>m—</span>
+        {/* Floating Spotlight Logo Card */}
+        <div
+          className="orb"
+          aria-hidden="true"
+          style={{
+            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 249, 255, 0.9) 100%)',
+            border: '3px solid rgba(255, 255, 255, 0.85)',
+            boxShadow: '0 25px 60px rgba(15, 23, 42, 0.22), 0 0 40px rgba(99, 102, 241, 0.15)',
+            backdropFilter: 'blur(16px)',
+            padding: 24,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <img
+            src="/logo.png"
+            alt="MentorBridge Official Logo"
+            style={{ width: '90%', height: '90%', objectFit: 'contain', filter: 'drop-shadow(0 8px 16px rgba(0,0,0,0.06))' }}
+          />
         </div>
 
         {/* Floating Trust Badge */}
